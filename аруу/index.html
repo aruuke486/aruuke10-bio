@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aruuke10Б</title>
+</head>
+<body>
+    <!DOCTYPE html>
+<html lang="ky">
+<head>
+  <meta charset="UTF-8">
+  <title>Молекулярдык Биология Симуляциясы</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background: #0d1117;
+      color: #c9d1d9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 25px;
+      min-height: 100vh;
+    }
+    h1 {
+      color: #58a6ff;
+      margin-bottom: 8px;
+      font-size: 28px;
+      text-align: center;
+    }
+    .subtitle {
+      color: #8b949e;
+      margin-bottom: 20px;
+      font-size: 16px;
+      text-align: center;
+    }
+    .layout {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 1100px;
+      width: 100%;
+    }
+    canvas {
+      background: #161b22;
+      border: 2px solid #30363d;
+      border-radius: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    }
+    .controls-panel {
+      width: 290px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 15px;
+    }
+    .card h3 {
+      color: #79c0ff;
+      font-size: 16px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #21262d;
+      padding-bottom: 6px;
+    }
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+      margin-bottom: 8px;
+      transition: opacity 0.2s;
+      color: #fff;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn-rep { background: #238636; }
+    .btn-transc { background: #1f6feb; }
+    .btn-transl { background: #8957e5; }
+    .btn-atp { background: #d29922; }
+    .btn-reset { background: #da3633; }
+
+    .atp-info {
+      font-size: 14px;
+      line-height: 1.5;
+      color: #d2a8ff;
+      margin-top: 5px;
+    }
+    
+    .log-container {
+      width: 100%;
+      max-width: 1100px;
+      margin-top: 20px;
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 15px;
+    }
+    .log-container h3 {
+      color: #58a6ff;
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+    #logBox {
+      height: 100px;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 13px;
+      background: #0d1117;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #21262d;
+      color: #7ee787;
+    }
+    .log-entry { margin-bottom: 4px; }
+
+    /* БОРБОРДУК ДОГМА ЖАНА ТАБЛИЦА СТИЛДЕРИ */
+    .dogma-container {
+      width: 100%;
+      max-width: 1100px;
+      margin-top: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .dogma-container h2 {
+      font-size: 22px;
+      color: #58a6ff;
+      border-bottom: 2px solid #30363d;
+      padding-bottom: 8px;
+    }
+    .dogma-schema {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    .schema-step {
+      text-align: center;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      padding: 18px;
+      border-radius: 8px;
+      flex: 1;
+      min-width: 240px;
+    }
+    .schema-step h4 { 
+      color: #58a6ff; 
+      font-size: 18px; 
+      margin-bottom: 8px; 
+    }
+    .schema-step p {
+      font-size: 14px;
+      line-height: 1.4;
+      color: #c9d1d9;
+    }
+    .schema-arrow {
+      font-size: 28px;
+      color: #79c0ff;
+      font-weight: bold;
+    }
+
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      overflow: hidden;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+    table.data-table th, table.data-table td {
+      border: 1px solid #30363d;
+      padding: 14px 16px;
+      text-align: left;
+    }
+    table.data-table th {
+      background: #21262d;
+      color: #58a6ff;
+      font-size: 16px;
+    }
+    .highlight-energy {
+      color: #7ee787;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Молекулярдык Биология Симуляциясы</h1>
+  <div class="subtitle">Борбордук догма: ДНК ➔ мРНК ➔ Белок | АТФ Энергетикасы</div>
+
+  <div class="layout">
+    <canvas id="simCanvas" width="780" height="480"></canvas>
+
+    <div class="controls-panel">
+      <div class="card">
+        <h3>1. Молекулярдык Процесстер</h3>
+        <button class="btn btn-rep" onclick="runReplication()">1. Репликация (ДНК ➔ ДНК)</button>
+        <button class="btn btn-transc" onclick="runTranscription()">2. Транскрипция (ДНК ➔ мРНК)</button>
+        <button class="btn btn-transl" onclick="runTranslation()">3. Трансляция (мРНК ➔ Белок)</button>
+      </div>
+
+      <div class="card">
+        <h3>2. АТФ Энергиясы</h3>
+        <button class="btn btn-atp" onclick="hydrolyzeATP()">⚡ АТФ Ажыратуу (-1 Фосфат)</button>
+        <div class="atp-info" id="atpStatus">
+          Абалы: АТФ (3 Фосфат)<br>
+          Бөлүнүү: 0 кДж/моль
+        </div>
+      </div>
+
+      <div class="card">
+        <button class="btn btn-reset" onclick="resetSim()">🔄 Калыбына келтирүү</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Байкоо журналы -->
+  <div class="log-container">
+    <h3>📝 Байкоо Журналы:</h3>
+    <div id="logBox">
+      <div class="log-entry">[Симуляция даяр] Баскычтарды басып биологиялык процесстерге байкоо жүргүзүңүз.</div>
+    </div>
+  </div>
+
+  <!-- БОРБОРДУК ДОГМА ЖАНА АТФ ТАБЛИЦАСЫ -->
+  <div class="dogma-container">
+    <h2>📊 Борбордук Догма жана АТФ Түзүлүшү</h2>
+
+    <!-- Блок-схема -->
+    <div class="dogma-schema">
+      <div class="schema-step">
+        <h4>1. ДНК</h4>
+        <p><b>Репликация:</b> ДНК молекуласы өзүнүн так көчүрмөсүн түзүүчү процесс. Генетикалык маалымат кийинки клеткаларга өткөрүлүп берилет.</p>
+      </div>
+      <div class="schema-arrow">➔</div>
+      <div class="schema-step">
+        <h4>2. РНК (мРНК)</h4>
+        <p><b>Транскрипция:</b> ДНК матрицасынын негизинде матрицалык РНКны (мРНК) синтездөө процесси. Маалымат ядродон цитоплазмага жеткирилет.</p>
+      </div>
+      <div class="schema-arrow">➔</div>
+      <div class="schema-step">
+        <h4>3. Белок</h4>
+        <p><b>Трансляция:</b> Рибосомада мРНК матрицасындагы аминокислоталардан белокту синтездөө процесси.</p>
+      </div>
+    </div>
+
+    <!-- Таблица -->
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Молекула / Процесс</th>
+          <th>Түзүмү жана Мүнөздөмөсү</th>
+          <th>Натыйжасы жана Энергетикалык Мааниси</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><b style="color: #7ee787;">1. Репликация</b></td>
+          <td>ДНК-полимераза ферментинин жардамы менен кош тизмектүү ДНКнын эки эселениши.</td>
+          <td>Генетикалык код толугу менен так көчүрүлөт.</td>
+        </tr>
+        <tr>
+          <td><b style="color: #79c0ff;">2. Транскрипция</b></td>
+          <td>РНК-полимераза аркылуу ДНК тизмегинен матрицалык РНК (мРНК) молекуласынын синтезделиши.</td>
+          <td>ДНКдагы маалымат мРНК кодондоруна көчүрүлөт.</td>
+        </tr>
+        <tr>
+          <td><b style="color: #d2a8ff;">3. Трансляция</b></td>
+          <td>Рибосома мРНКдагы триплет кодондорду окуп, тРНК алып келген аминокислоталарды бириктирет.</td>
+          <td>Спецификалык белок чынжыры пайда болот.</td>
+        </tr>
+        <tr>
+          <td><b style="color: #ffeaa7;">АТФ (Аденозинтрифосфат)</b></td>
+          <td>Аденин + Рибоза + 3 фосфор кислотасынын калдыгы (Ф - Ф - Ф). Клеткадагы негизги энергия булагы.</td>
+          <td>Жогорку энергиялык (макроэргикалык) байланыштарга ээ.</td>
+        </tr>
+        <tr>
+          <td><b style="color: #ff7675;">АДФ (Аденозиндифосфат)</b></td>
+          <td>Аденин + Рибоза + 2 фосфор кислотасынын калдыгы (Ф - Ф) + Ажыраган эркин фосфат (Ф).</td>
+          <td class="highlight-energy">⚡ Фосфат ажыраганда болжол менен 40 кДж/моль энергия бөлүнүп чыгат.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('simCanvas');
+    const ctx = canvas.getContext('2d');
+    const logBox = document.getElementById('logBox');
+    const atpStatus = document.getElementById('atpStatus');
+
+    const COLORS = {
+      A: '#ff7675', T: '#74b9ff', U: '#a29bfe', C: '#55efc4', G: '#ffeaa7',
+      P: '#fdcb6e', Ribosome: '#e17055'
+    };
+
+    const GENETIC_CODE = {
+      'AUG': 'Мет (Старт)', 'UAC': 'Тир', 'GGC': 'Гли', 'CCU': 'Про',
+      'UAA': 'СТОП', 'GAC': 'Асп', 'CUG': 'Лей'
+    };
+
+    const dnaOriginal = ['A', 'T', 'G', 'C', 'C', 'T', 'T', 'A', 'C'];
+    const complements = { A: 'T', T: 'A', C: 'G', G: 'C', U: 'A' };
+    const rnaPairs = { A: 'U', T: 'A', C: 'G', G: 'C' };
+
+    let mrnaChain = [];
+    let proteinChain = [];
+    let mode = 'IDLE';
+    let animIndex = -1;
+    let atpState = 3;
+
+    function log(message) {
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      const time = new Date().toLocaleTimeString();
+      entry.innerText = `[${time}] ${message}`;
+      logBox.appendChild(entry);
+      logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    function drawDNA() {
+      const startX = 50;
+      const y1 = 80;
+      const y2 = 140;
+
+      ctx.fillStyle = '#8b949e';
+      ctx.font = 'bold 13px Arial';
+      ctx.fillText("ДНК Тизмеги (3' -> 5')", startX, y1 - 25);
+
+      dnaOriginal.forEach((base, i) => {
+        const x = startX + i * 45;
+        ctx.strokeStyle = '#30363d';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x, y1);
+        ctx.lineTo(x, y2);
+        ctx.stroke();
+
+        drawNucleotide(x, y1, base);
+        drawNucleotide(x, y2, complements[base]);
+
+        if (mode === 'REPLICATION' && i < animIndex) {
+          drawNucleotide(x, y2 + 40, complements[base]);
+          ctx.strokeStyle = '#238636';
+          ctx.beginPath();
+          ctx.moveTo(x, y2 + 15);
+          ctx.lineTo(x, y2 + 40);
+          ctx.stroke();
+        }
+      });
+    }
+
+    function drawmRNA() {
+      if (mrnaChain.length === 0) return;
+      const startX = 50;
+      const y = 240;
+
+      ctx.fillStyle = '#a29bfe';
+      ctx.font = 'bold 13px Arial';
+      ctx.fillText("мРНК Тизмеги (Транскрипция):", startX, y - 20);
+
+      mrnaChain.forEach((base, i) => {
+        const x = startX + i * 45;
+        drawNucleotide(x, y, base);
+
+        if (mode === 'TRANSLATION' && Math.floor(i / 3) === Math.floor(animIndex / 3)) {
+          ctx.strokeStyle = '#e17055';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(x - 18, y - 18, 40, 36);
+        }
+      });
+    }
+
+    function drawProtein() {
+      if (proteinChain.length === 0) return;
+      const startX = 50;
+      const y = 330;
+
+      ctx.fillStyle = '#79c0ff';
+      ctx.font = 'bold 13px Arial';
+      ctx.fillText("Аминокислоталык Тизмек (Белок):", startX, y - 20);
+
+      proteinChain.forEach((amino, i) => {
+        const x = startX + i * 110;
+        ctx.fillStyle = '#8957e5';
+        ctx.beginPath();
+        ctx.roundRect(x, y, 95, 32, 8);
+        ctx.fill();
+
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 12px Arial';
+        ctx.fillText(amino, x + 8, y + 20);
+
+        if (i > 0) {
+          ctx.strokeStyle = '#d2a8ff';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.moveTo(x - 15, y + 16);
+          ctx.lineTo(x, y + 16);
+          ctx.stroke();
+        }
+      });
+    }
+
+    function drawATP() {
+      const x = 520;
+      const y = 60;
+
+      ctx.fillStyle = '#d29922';
+      ctx.font = 'bold 13px Arial';
+      ctx.fillText("АТФ Түзүлүшү:", x, y - 15);
+
+      ctx.fillStyle = '#388bfd';
+      ctx.beginPath();
+      ctx.arc(x, y, 16, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.font = '11px Arial';
+      ctx.fillText("Аденозин", x - 22, y + 28);
+
+      for (let i = 0; i < 3; i++) {
+        const pX = x + 40 + i * 30;
+        if (i < atpState) {
+          ctx.fillStyle = i === 2 ? '#f85149' : '#d29922';
+          ctx.beginPath();
+          ctx.arc(pX, y, 10, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = '#000';
+          ctx.font = 'bold 11px Arial';
+          ctx.fillText("Ф", pX - 4, y + 4);
+
+          ctx.strokeStyle = '#8b949e';
+          ctx.beginPath();
+          ctx.moveTo(i === 0 ? x + 16 : pX - 20, y);
+          ctx.lineTo(pX - 10, y);
+          ctx.stroke();
+        }
+      }
+
+      if (atpState === 2) {
+        ctx.fillStyle = '#f85149';
+        ctx.beginPath();
+        ctx.arc(x + 150, y + 25, 8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillText("Ф", x + 147, y + 28);
+
+        ctx.fillStyle = '#7ee787';
+        ctx.font = 'bold 14px Arial';
+        ctx.fillText("⚡ +40 кДж/моль!", x + 45, y + 48);
+      }
+    }
+
+    function drawNucleotide(x, y, label) {
+      ctx.fillStyle = COLORS[label] || '#fff';
+      ctx.beginPath();
+      ctx.arc(x, y, 14, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#0d1117';
+      ctx.font = 'bold 12px Arial';
+      ctx.fillText(label, x - 4, y + 4);
+    }
+
+    function runReplication() {
+      if (atpState < 3) {
+        log("⚠️ Энергия жетишсиз! Баштап АТФти ажыратып энергия алыңыз.");
+        return;
+      }
+      mode = 'REPLICATION';
+      animIndex = 0;
+      log("🧬 ДНК Репликациясы башталды.");
+
+      const interval = setInterval(() => {
+        animIndex++;
+        if (animIndex >= dnaOriginal.length) {
+          clearInterval(interval);
+          log("✅ Репликация аяктады.");
+        }
+      }, 400);
+    }
+
+    function runTranscription() {
+      mode = 'TRANSCRIPTION';
+      mrnaChain = [];
+      animIndex = 0;
+      log("🧬 РНК Транскрипциясы башталды.");
+
+      const interval = setInterval(() => {
+        if (animIndex < dnaOriginal.length) {
+          mrnaChain.push(rnaPairs[dnaOriginal[animIndex]]);
+          animIndex++;
+        } else {
+          clearInterval(interval);
+          log(`✅ Транскрипция бүттү. мРНК: ${mrnaChain.join('')}`);
+        }
+      }, 400);
+    }
+
+    function runTranslation() {
+      if (mrnaChain.length === 0) {
+        log("⚠️ Баштап Транскрипция жасаңыз!");
+        return;
+      }
+      mode = 'TRANSLATION';
+      proteinChain = [];
+      animIndex = 0;
+      log("🧬 Трансляция башталды.");
+
+      const interval = setInterval(() => {
+        if (animIndex < mrnaChain.length) {
+          if (animIndex % 3 === 0 && animIndex + 3 <= mrnaChain.length) {
+            const codon = mrnaChain.slice(animIndex, animIndex + 3).join('');
+            const amino = GENETIC_CODE[codon] || 'Аминокислота';
+            proteinChain.push(amino);
+            log(`📌 Кодон: [${codon}] -> ${amino}`);
+          }
+          animIndex += 3;
+        } else {
+          clearInterval(interval);
+          log(`✅ Трансляция аяктады.`);
+        }
+      }, 1000);
+    }
+
+    function hydrolyzeATP() {
+      if (atpState === 3) {
+        atpState = 2;
+        atpStatus.innerHTML = `Абалы: АДФ + Фосфат<br>Бөлүнүү: <b>~40 кДж/моль</b>`;
+        log("💥 АТФтен 1 фосфат ажырап, ~40 кДж/моль энергия бөлүнүп чыкты.");
+      }
+    }
+
+    function resetSim() {
+      mode = 'IDLE';
+      animIndex = -1;
+      mrnaChain = [];
+      proteinChain = [];
+      atpState = 3;
+      atpStatus.innerHTML = `Абалы: АТФ (3 Фосфат)<br>Бөлүнүү: 0 кДж/моль`;
+      log("🔄 Симуляция баштапкы абалга келтирилди.");
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawDNA();
+      drawmRNA();
+      drawProtein();
+      drawATP();
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
+</html>
+</body>
+</html>
